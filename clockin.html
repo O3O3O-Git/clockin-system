@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>多人打卡系統</title>
+<style>
+  body { font-family: Arial; margin:30px; background:#f5f5f5;}
+  h1 { text-align:center;}
+  .input-area { text-align:center; margin-bottom:15px;}
+  input { padding:8px; font-size:16px; border:1px solid #ccc; border-radius:6px;}
+  button { display:block; margin:20px auto; padding:10px 20px; font-size:18px; 
+           border:none; border-radius:8px; background:#4CAF50; color:white; cursor:pointer;}
+  button:hover { background:#45a049;}
+</style>
+</head>
+<body>
+<h1>多人打卡系統</h1>
+
+<div class="input-area">
+<label for="nameInput">姓名：</label>
+<input type="text" id="nameInput" placeholder="請輸入姓名">
+</div>
+
+<button onclick="clockIn()">打卡上班</button>
+
+<script>
+const SCRIPT_URL = "你的 /exec 網址";
+
+async function clockIn() {
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name){ alert("請先輸入姓名！"); return; }
+
+  const now = new Date();
+  const date = now.toLocaleDateString('zh-TW');
+  const time = now.toLocaleTimeString('zh-TW');
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ name:name, date:date, time:time }),
+      headers: { "Content-Type":"application/json" }
+    });
+
+    const text = await response.text();
+    if(text === "success"){
+      alert("打卡成功！");
+      document.getElementById("nameInput").value = "";
+    } else {
+      alert("打卡失敗，請再試一次。");
+    }
+  } catch(err){
+    alert("無法連線到打卡系統。\n錯誤：" + err);
+  }
+}
+</script>
+</body>
+</html>
